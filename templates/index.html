@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Encryption/Decryption</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body style="background-image: url('/static/enc and dec.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+    <div class="container">
+        <h1>File Encryption/Decryption</h1>
+        <form action="{{ url_for('process') }}" method="post" enctype="multipart/form-data" id="main-form">
+            <label for="action">Choose Action:</label>
+            <select name="action" id="action" required>
+                <option value="encrypt" selected>Encrypt Files</option>
+                <option value="decrypt">Decrypt Files</option>
+            </select>
+
+            <div id="file-upload-section">
+                <label for="files">Upload Files (for encryption):</label>
+                <input type="file" name="files[]" id="files" multiple required>
+            </div>
+
+            <div id="secret-key-section" style="display: none;">
+                <label for="secret_key">Enter Secret Key (for decryption):</label>
+                <input type="password" name="secret_key" id="secret_key">
+            </div>
+
+            <button type="submit" id="submit-button">Submit</button>
+        </form>
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="message {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <footer>
+        <p>Project by Abdulhakim Abdurrazak Sulaiman</p>
+        <ul class="social-links">
+            <li><a href="https://github.com/Abdoul2146" target="_blank"><i class="fab fa-github"></i></a></li>
+            <li><a href="https://www.linkedin.com/in/abdulhakim-abdurrazak-sulaiman-98bb38242/" target="_blank"><i class="fab fa-linkedin"></i></a></li>
+            <li><a href="https://twitter.com/AbdulhakimASul2" target="_blank"><i class="fab fa-twitter"></i></a></li>
+        </ul>
+        <p><a href="https://github.com/Abdoul2146/hearing_test_classification_app" target="_blank">View Project on GitHub</a></p>
+    </footer>
+
+    <script>
+        // Add event listener to dynamically update the form
+        document.getElementById('action').addEventListener('change', function () {
+            const action = this.value;
+            const secretKeySection = document.getElementById('secret-key-section');
+            const fileUploadSection = document.getElementById('file-upload-section');
+
+            if (action === 'decrypt') {
+                // Show secret key section and update file input for decryption
+                secretKeySection.style.display = 'block';
+                fileUploadSection.innerHTML = `
+                    <label for="files">Upload Encrypted File:</label>
+                    <input type="file" name="file" id="files" required>
+                `;
+            } else {
+                // Hide secret key section and update file input for encryption
+                secretKeySection.style.display = 'none';
+                fileUploadSection.innerHTML = `
+                    <label for="files">Upload Files (for encryption):</label>
+                    <input type="file" name="files[]" id="files" multiple required>
+                `;
+            }
+        });
+
+        // Ensure form submission works
+        document.getElementById('main-form').addEventListener('submit', function (event) {
+            const action = document.getElementById('action').value;
+
+            if (action === 'decrypt') {
+                const secretKey = document.getElementById('secret_key').value;
+                if (!secretKey) {
+                    event.preventDefault(); // Prevent submission
+                    alert('Please provide a secret key for decryption.');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
